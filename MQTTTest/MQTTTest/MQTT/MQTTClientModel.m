@@ -113,16 +113,12 @@
 
 - (MQTTSSLSecurityPolicy *)customSecurityPolicy
 {
-//    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"ca" ofType:@"crt"];
-//
-//    NSData *certData = [NSData dataWithContentsOfFile:cerPath];
     
     MQTTSSLSecurityPolicy *securityPolicy = [MQTTSSLSecurityPolicy policyWithPinningMode:MQTTSSLPinningModeNone];
     
     securityPolicy.allowInvalidCertificates = YES;
     securityPolicy.validatesCertificateChain = YES;
     securityPolicy.validatesDomainName = NO;
-//    securityPolicy.pinnedCertificates = @[certData];
     return securityPolicy;
 }
 
@@ -203,7 +199,8 @@
 - (void)sendDataToTopic:(NSString *)topic dict:(NSDictionary *)dict {
     
     NSLog(@"发送命令 topic = %@  dict = %@",topic,dict);
-    [self.mySessionManager.session publishJson:dict onTopic:topic];
+    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
+    [self.mySessionManager sendData:data topic:topic qos:MQTTQosLevelAtLeastOnce retain:NO];
 }
 
 #pragma mark - 懒加载
